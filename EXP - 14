@@ -1,0 +1,131 @@
+Experiment - 14
+Aim: Use airline reservation database system designed in Practical number 9. Write a trigger 
+•	Which will compel the insertion of values of origin and destination fields in all capital letters only. User route_header table used in practical number 8.
+•	Which will not allow the reduction of values of capacity field in the route_header field.
+
+TRIGGERS
+
+triggers are of 2 types: system defined, user defined.Same as exceptions
+triggers are again of 2 types: statement level (saare statements ek sath update honge ek hi command use karke) , row level (perticular row hi update hoga jo condition satisfy karega)
+-----------------------------------------------------------------------------------------------
+Every action will have trigger and then generate reaction
+action: Insert into st_info values(24070, "reshal", D... )
+   |  TRIGGER
+   V
+reaction : 1 row created.
+---------------------------------------------------------------------------------------------
+to declare any variable in triggers, we have to 'declare' keyword
+'AS' is only used for procedures and functions
+--------------------------------------------------------------------------------------------
+SYNTAX:
+CREATE OR REPLACE Trigger tig_name
+	before || After for each
+	Insert || update || delete on table_name
+begin
+	code
+end;
+/
+-------------------------------------------------------------------------------------
+CREATE OR REPLACE Trigger tig_st
+Before update on st_info
+begin
+DBMS_OUTPUT.PUT_LINE('This is statement level trigger fired');
+end;
+/
+
+Set ServerOutput ON;
+
+update st_info set total=m1+m2+m3;
+----------------------------------------------------------------------------------------
+CREATE OR REPLACE Trigger trig_row
+Before update on st_info for each row
+begin
+where(total>230);
+DBMS_OUTPUT.PUT_LINE('This is row level trigger fired');
+end;
+/
+--------------------------------------------------------------------------
+CREATE OR REPLACE Trigger trig_ins
+Before row level on st_info for each row
+begin
+if(m1<0 or m1>100 and m2<0 or m2>100 and m3<0 or m3 >100) then
+DBMS_OUTPUT.PUT_LINE('This is row level trigger fired');
+end;
+/
+-------------------------------------------------------------------------
+create a table emp2 with fields empno as int, name as character, category as int (takes only 3 categories ie. 1,2,3) 
+
+design a trigger for insertion or updation a new record in capital letters only (hint: name = upper(name))
+
+CREATE TABLE emp2 (
+empno NUMBER PRIMARY KEY,
+name VARCHAR2(50),
+category NUMBER CHECK (category IN (1,2,3))
+);
+
+INSERT INTO emp2 VALUES (1, 'resh', 2);
+INSERT INTO emp2 VALUES (2, 'namu', 3);
+INSERT INTO emp2 VALUES (3, 'thor', 1);
+INSERT INTO emp2 VALUES (4, 'bunny', 2);
+INSERT INTO emp2 VALUES (5, 'chirpy', 1);
+INSERT INTO emp2 VALUES (6, 'toto', 2);
+
+SELECT * FROM emp2;
+
+CREATE OR REPLACE TRIGGER emp2_capital_trg
+BEFORE INSERT OR UPDATE ON emp2
+FOR EACH ROW
+BEGIN
+    :NEW.name := UPPER(:NEW.name);
+END;
+/
+
+SELECT * FROM emp2;
+
+-----------------------------------------------------------------------------
+add another field salary as number to the table
+design a trigger for insertion or updation for the following:
+if category is 1 then salary should be more than 10000
+if category is 2 then salary should be more than 20000
+if category is 3 then salary should be more than 30000
+
+ALTER TABLE emp2
+ADD salary NUMBER;
+
+DESC emp2;
+
+INSERT INTO emp2 VALUES (7, 'abc', 3, 50000);
+INSERT INTO emp2 VALUES (8, 'def', 2, 8000);
+INSERT INTO emp2 VALUES (9, 'lmn', 2, 14000);
+INSERT INTO emp2 VALUES (10, 'xyz', 1, 23000);
+
+SELECT * FROM emp2;
+
+CREATE OR REPLACE FUNCTION check_salary (
+    p_category NUMBER,
+    p_salary   NUMBER
+)
+RETURN VARCHAR2
+IS
+BEGIN
+    IF p_category = 1 AND p_salary <= 10000 THEN
+        DBMS_OUTPUT.PUT_LINE('Salary must be > 10000 for category 1');
+        
+    ELSIF p_category = 2 AND p_salary <= 20000 THEN
+        DBMS_OUTPUT.PUT_LINE('Salary must be > 20000 for category 2');
+        
+    ELSIF p_category = 3 AND p_salary <= 30000 THEN
+        DBMS_OUTPUT.PUT_LINE('Salary must be > 30000 for category 3');
+        
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Valid Salary');
+    END IF;
+END;
+/
+
+SELECT check_salary(8, 8000) AS result FROM dual;
+o/p: RESULT
+--------------------------------------------------------------------------------
+Valid Salary
+
+SELECT check_salary(2, 8000) AS result FROM dual;
