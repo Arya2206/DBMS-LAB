@@ -9,7 +9,7 @@ triggers are of 2 types: system defined, user defined.Same as exceptions
 triggers are again of 2 types: statement level (saare statements ek sath update honge ek hi command use karke) , row level (perticular row hi update hoga jo condition satisfy karega)
 -----------------------------------------------------------------------------------------------
 Every action will have trigger and then generate reaction
-action: Insert into st_info values(24070, "reshal", D... )
+action: Insert into st_info values(24070, "Arya", D... )
    |  TRIGGER
    V
 reaction : 1 row created.
